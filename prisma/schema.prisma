@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  faculty   Faculty @relation(fields: [facultyId], references: [id])
+  facultyId String @db.ObjectId
+  sports    StudentSport[]
+  createdAt DateTime @default(now())
+}
+
+model Faculty {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String    @unique
+  students Student[]
+}
+
+model Sport {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  name      String         @unique
+  students  StudentSport[]
+}
+
+model StudentSport { // This is a join table for many-to-many relation
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String @db.ObjectId
+  sport     Sport @relation(fields: [sportId], references: [id])
+  sportId   String @db.ObjectId
+}
